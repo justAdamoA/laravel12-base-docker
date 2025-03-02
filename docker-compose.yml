@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./:/home/php/app
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+      - "8001:8001"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres:17.3-alpine3.21
+    restart: always
+    volumes:
+      - ./dbvolume/:/var/lib/postgresql/data/pgdata
+    ports:
+      - "8003:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=en-US"
+  redis:
+    image: redis:7.4.2-alpine3.21
+    volumes:
+      - ./redisvolume:/data
+    ports:
+      - 8004:6379
